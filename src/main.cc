@@ -22,6 +22,7 @@
 #include <gim/gim.h>
 
 #include <twt_gkmake.h>
+#include <twt_define.h>
 
 int main( int argc , char **argv ) {
 
@@ -29,44 +30,71 @@ int main( int argc , char **argv ) {
         printf( "%s\n\n" , gim_version() );
         printf( "Gim is not updated at the required version.\n" );
         printf( "For %s is necessary Gim >= 2.8\n" , argv[0] );
-        exit( -1 );
+        exit( __GIM_ERROR );
     }
     
-    gim_set_application_name( "test" );
+    gim_set_application_name( "TWT-Sim" );
     gim_obj * gim = new gim_obj;
     
     printf( "TWT-Sim : Tag Walking Technology Simulator\n" );
     printf( "Test suite for checking the TWT consistency algorithm\n" );
     printf( "Powered by: %s\n" , gim_version() );
     printf( "Ran by: %s@%s\n\n" , gim->identity->login() , gim->identity->node() );
-    
-	_gim_string passw;
-	if ( argc > 1 ) {	
-		puts( argv[1] );
-	    passw.set( argv[1] );
-	    passw.cat( " - " );
-    }
-    passw.cat( gim->identity->login() );
-    passw.cat( "@" );
-    passw.cat( gim->identity->node() );
-	printf( "%x - %s: %s\n" , gim->checksum->chsum( gim->checksum->sha512( passw.c_str() , passw.length() ) ) , passw.c_str() , gim->checksum->sha512( passw.c_str() , passw.length() ) );
+	puts( "TWT initializing...\n" );	
+	
+	printf( "  TWT status: creating...");
+	usleep( 50 );
+	_twt_st	* twt = (_twt_st *)gim->memory->Alloc( sizeof( _twt_st ) ); 
+	twt->status = __INIT_ST;
+	twt->perc_non_paganti = 15;				//	%
+	twt->capienza = 120;					//	persone max
+	twt->intensita = 0;						//	flusso persone
+	twt->fermata_corrente = __UP_CAPO;		//	Capolinea 
+	twt->capolinea_sec = 30;
+	twt->chporte_sec = 2;
+	twt->viaggio_sec = 15;
+	twt->approccio_sec = 5;	
+	twt->errore = __GIM_NO;					//	Errore da iniettare
+	
+	printf( "done!\n");
+	
+	printf( "  Passengers: creating...");
+	_gim_list	* people = new _gim_list;
+	_twt_man	* Tman = NULL;
+	
+	for( int c = 0 ; c < PEOPLE_NUMBER ; c++ ) {
+		Tman = new_twt_man( gim );
+		people->add_item( (void *)Tman );
+		usleep( 50 );
+	}
+	printf( "done!\n");
+	puts( "\n-------------------------------------------------" );
+	
 
-	_gim_ascii_buffer * a = new _gim_ascii_buffer;
-	a->set_dimension( 100000 );
 
-    MTRand	* r = new MTRand;
-    r->seed( gim->checksum->chsum( gim->checksum->sha512( passw.c_str() , passw.length() ) ) );
-    for( _gim_Uint32 c = 0 ; c < a->get_dimension()  ; c++ ) {
-//    	printf( "%d scrivo" , c );
-    	a->append( "%c" , r->randUInt8() ); 
-    }
-
-    _gim_file   f( "./buffer_mt_to_test" , __GIM_FILE_POINTER , __GIM_WRITE );
-    f.flush( a->get_buffer() , a->get_dimension() );
-    f.close();
-        
-	delete a;	    
-    delete r;
+	
+	puts("");
+	gim->memory->Free( (void *)twt );
+	delete people;   
     delete gim;
 }
+
+
+
+_twt_man *	new_twt_man( gim_obj * gim ) {
+	_twt_man	* Tman = NULL;
+	Tman = (_twt_man *)gim->memory->Alloc( sizeof( _twt_man ) );
+	Tman->type = __UNKN;
+	Tman->linea = 1;
+	Tman->active = __NOT_ACTIVE;
+	Tman->id_salita = __GIM_NO;
+	Tman->on_board = __GIM_NO;
+	Tman->id_discesa = __GIM_NO;
+	Tman->status = __UNDIFINED;
+	__GIM_CLEAR( Tman->code_id , GIM_MD5_SIZE , char );
+	Tman->twt_str_code = _UN;
+	Tman->twt_mid_code = _UN;
+	Tman->twt_end_code = _UN;
+	return Tman;
+} 
 

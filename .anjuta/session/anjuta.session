@@ -1,9 +1,9 @@
 [Anjuta]
 Maximized=1
-Geometry=1920x998+0+0
+Geometry=1920x990+0+33
 
 [File Loader]
-Files=../../src/main.cc#55%%%../../src/twt_gkmake.h#26%%%../../src/twt_define.h#48
+Files=../../src/main.cc#59%%%../../src/twt_gkmake.h#14%%%../../src/twt_define.h#48
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -13,8 +13,7 @@ Run in terminal=2
 Working directories=../../.
 
 [Project Manager]
-Shortcut=TWT-Sim//src//twt_sim
-Expand=TWT-Sim%%%TWT-Sim//src%%%TWT-Sim//src//twt_sim
+Expand=twt-sim%%%twt-sim//src%%%twt-sim//src//twt_sim
 
 [Debugger]
 Stop at beginning=2
