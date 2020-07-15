@@ -16,7 +16,8 @@ bin_PROGRAMS = twt_sim
 twt_sim_SOURCES = \
 	main.cc \
 	twt_gkmake.h \
-	twt_define.h
+	twt_define.h \
+	twt_functions.cc
 
 twt_sim_LDFLAGS = 
 

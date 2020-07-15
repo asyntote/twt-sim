@@ -99,7 +99,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_twt_sim_OBJECTS = main.$(OBJEXT)
+am_twt_sim_OBJECTS = main.$(OBJEXT) twt_functions.$(OBJEXT)
 twt_sim_OBJECTS = $(am_twt_sim_OBJECTS)
 twt_sim_DEPENDENCIES =
 twt_sim_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(twt_sim_LDFLAGS) \
@@ -119,7 +119,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/main.Po
+am__depfiles_remade = ./$(DEPDIR)/main.Po ./$(DEPDIR)/twt_functions.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -308,7 +308,8 @@ AM_CFLAGS = \
 twt_sim_SOURCES = \
 	main.cc \
 	twt_gkmake.h \
-	twt_define.h
+	twt_define.h \
+	twt_functions.cc
 
 twt_sim_LDFLAGS = 
 twt_sim_LDADD = \
@@ -401,6 +402,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/twt_functions.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -550,6 +552,7 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/main.Po
+	-rm -f ./$(DEPDIR)/twt_functions.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -596,6 +599,7 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/main.Po
+	-rm -f ./$(DEPDIR)/twt_functions.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

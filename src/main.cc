@@ -41,9 +41,9 @@ int main( int argc , char **argv ) {
     printf( "Powered by: %s\n" , gim_version() );
     printf( "Ran by: %s@%s\n\n" , gim->identity->login() , gim->identity->node() );
 	puts( "TWT initializing...\n" );	
-	
+
 	printf( "  TWT status: creating...");
-	usleep( 50 );
+	twt_sleep( 1.0 );
 	_twt_st	* twt = (_twt_st *)gim->memory->Alloc( sizeof( _twt_st ) ); 
 	twt->status = __INIT_ST;
 	twt->perc_non_paganti = 15;				//	%
@@ -55,46 +55,42 @@ int main( int argc , char **argv ) {
 	twt->viaggio_sec = 15;
 	twt->approccio_sec = 5;	
 	twt->errore = __GIM_NO;					//	Errore da iniettare
-	
 	printf( "done!\n");
+
+	twt_sleep( 0.2 );
+	printf( "  Current status: %s\n" , get_state_name( twt->status ) );
 	
 	printf( "  Passengers: creating...");
-	_gim_list	* people = new _gim_list;
-	_twt_man	* Tman = NULL;
+	_gim_list		* people = new _gim_list;
+	_twt_man		* Tman = NULL;
+	_gim_checksum	* cs = new _gim_checksum;
 	
-	for( int c = 0 ; c < PEOPLE_NUMBER ; c++ ) {
+/*	for( int c = 0 ; c < PEOPLE_NUMBER ; c++ ) {
 		Tman = new_twt_man( gim );
 		people->add_item( (void *)Tman );
-		usleep( 50 );
+		usleep( 20 );
 	}
+*/	twt_sleep( 1.0 );
 	printf( "done!\n");
-	puts( "\n-------------------------------------------------" );
 	
+	puts( "\n-------------------------------------------------" );
+	twt_sleep( 1.0 );
 
-
+	twt->status = __STAR_ST;
+	printf( "  Current status: %s\n" , get_state_name( twt->status ) );
+	twt_sleep( 0.5 );
+	puts( "\n-------------------------------------------------" );
+		
+	__MAIN_LOOP( 10 ) {
+		viaggio_andata( vg , gim , people , twt );
+	
+	}
 	
 	puts("");
 	gim->memory->Free( (void *)twt );
+	delete cs;
 	delete people;   
     delete gim;
 }
 
-
-
-_twt_man *	new_twt_man( gim_obj * gim ) {
-	_twt_man	* Tman = NULL;
-	Tman = (_twt_man *)gim->memory->Alloc( sizeof( _twt_man ) );
-	Tman->type = __UNKN;
-	Tman->linea = 1;
-	Tman->active = __NOT_ACTIVE;
-	Tman->id_salita = __GIM_NO;
-	Tman->on_board = __GIM_NO;
-	Tman->id_discesa = __GIM_NO;
-	Tman->status = __UNDIFINED;
-	__GIM_CLEAR( Tman->code_id , GIM_MD5_SIZE , char );
-	Tman->twt_str_code = _UN;
-	Tman->twt_mid_code = _UN;
-	Tman->twt_end_code = _UN;
-	return Tman;
-} 
 

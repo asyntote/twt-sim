@@ -34,23 +34,51 @@
 		
 	#define __ACTIVE		1
 	#define	__NOT_ACTIVE	0
-
+	
+	#define	__MAIN_LOOP(a)	for( _gim_Uint8 vg = 0 ; vg < a ; vg++ )	
 		
-	#define	__INIT		"Inizializzazione"	
-	#define	__CAPO		"Capolinea"
-	#define	__VIAG		"Viaggio"
-	#define	__APPR		"Approccio"
-	#define	__FERM		"In fermata"
-	#define	__CHIU		"Chiusura porte"
+	#define	__INIT		"TWT Initialization!"	
+	#define	__STAR		"The bus starts the service"
+	#define	__CAPA		"Arrival at the bus terminus."
+	#define	__CAPO		"Stop at the bus terminus."
+	#define	__CAPP		"Departure from the bus terminus."
+	#define	__VIAG		"Bus traveling."
+	#define	__APPR		"Bus approaching the stop."
+	#define	__FERM		"The bus stops. Doors opening."
+	#define	__CHIU		"Doors closing. The bus leaves the stop."
 
-	#define	__INIT_ST	-1
-	#define	__CAPA_ST	0
-	#define	__CAPO_ST	2
-	#define	__CAPP_ST	1
-	#define	__VIAG_ST	3
-	#define	__APPR_ST	4
-	#define	__FERM_ST	5
-	#define	__CHIU_ST	6
+	#define	__INIT_ST	-2		//	Inizialiazzazione
+	#define	__STAR_ST	-1		//	Entrata in servizio
+	#define	__CAPA_ST	0		//	Arrivo in Capolinea
+	#define	__CAPO_ST	2		//	Sosta in Capolinea
+	#define	__CAPP_ST	1		//	Partenza da Capolinea
+	#define	__VIAG_ST	3		//	Viaggio
+	#define	__APPR_ST	4		//	Approccio in fermata
+	#define	__FERM_ST	5		//	Fermata
+	#define	__CHIU_ST	6		//	Ciusura porte e partenza da fermata
+	
+	#define	__STAR_TM	1.0
+	#define	__CAPA_TM	1.0		//	Arrivo in Capolinea
+	#define	__CAPO_TM	5.0		//	Sosta in Capolinea
+	#define	__CAPP_TM	1.0		//	Partenza da Capolinea
+	#define	__VIAG_TM	1.0		//	Viaggio
+	#define	__APPR_TM	1.0		//	Approccio in fermata
+	#define	__FERM_TM	1.0		//	Fermata
+	#define	__CHIU_TM	1.0		//	Ciusura porte e partenza da fermata
+	
+/*	#define	__STAR_TM	1.0
+	#define	__CAPA_TM	1.0		//	Arrivo in Capolinea
+	#define	__CAPO_TM	5.0		//	Sosta in Capolinea
+	#define	__CAPP_TM	1.0		//	Partenza da Capolinea
+	#define	__VIAG_TM	10.0	//	Viaggio
+	#define	__APPR_TM	2.0		//	Approccio in fermata
+	#define	__FERM_TM	5.0		//	Fermata
+	#define	__CHIU_TM	2.0		//	Ciusura porte e partenza da fermata
+*/	
+
+//	COLOR_NC='\e[0m'
+//	COLOR_RED='\e[0;31m'
+//	COLOR_GREEN='\e[0;32m'
 
 
 	enum _man_status {
@@ -81,63 +109,10 @@
 	
 	#define	__UP_CAPO		0
 	#define	__DW_CAPO		52
+	#define __BSTOPS		( __DW_CAPO + 1 )		
 	
 	
-	char	Linea1[][64] = {	
-		"CARICAMENTO/ACQUARIO",				//	 0
-		"GRAMSCI 1/METRO' DARSENA",			// 	 1
-		"GRAMSCI 2/STATUTO",				//	 2
-		"GRAMSCI 3/COMMENDA",				//	 3
-		"MARITTIMA/PRINCIPE FS",			//	 4
-		"BUOZZI 1/PIAZZA SAN TEODORO",		//	 5
-		"BUOZZI 2/METRO' DINEGRO",			//	 6
-		"FRANCIA 2/MATITONE",				//	 7
-		"FRANCIA 3/STAZIONE FS",			//	 8
-		"BURANELLO 1/BARABINO",				//	 9
-		"BURANELLO 2/GIOVANETTI",			//	10
-		"AVIO 1/MOLTENI",					//	11
-		"PACINOTTI/FIUMARA",				//	12
-		"PIERAGOSTINI/FIUMARA",				//	13
-		"ANSALDO/MASSENA",					//	14
-		"CORNIGLIANO 1/GIARDINI MELIS",		//	15
-		"CORNIGLIANO 2/RIZZOLIO",			//	16
-		"CORNIGLIANO 3/PIAZZA CONTI",		//	17
-		"CORNIGLIANO 4/STAZIONE FS",		//	18
-		"SIFFREDI 1/TONALE",				//	19
-		"SIFFREDI 2/ACCIAIO",				//	20
-		"SIFFREDI 3/CALCINARA",				//	21
-		"HERMADA/MENOTTI",					//	22
-		"PUCCINI 1/TRAVI",					//	23
-		"PUCCINI 2/SESTRI FS AEROPORTO",	//	24
-		"SOLIMAN/CERRUTI",					//	25
-		"MERANO 1/VILLA ROSSI",				//	26
-		"MERANO 2/MONFALCONE",				//	27
-		"MERANO 3/AMIU",					//	28
-		"MULTEDO/VILLA CHIESA",				//	29
-		"RONCHI/VIGILI DEL FUOCO",			//	30
-		"LUNGOMARE DI PEGLI 1/VARENNA",		//	31
-		"LUNGOMARE DI PEGLI 2/PEGLI FS",	//	32
-		"PEGLI 5/CASTELLUCCIO",				//	33
-		"PRA' 1/BIOMEDICAL",				//	34
-		"PEGLI 3/ASL",						//	35
-		"PEGLI 4/LIDO",						//	36
-		"PEGLI 5/CASTELLUCCIO",				//	37
-		"PRA' 1/BIOMEDICAL",				//	38
-		"PRA' 2/FERRIERE",					//	39
-		"PRA' 3/PRA' FS",					//	40
-		"PRA' 5/CORDANIERI",				//	41
-		"PRA' 6/LAURA",						//	42							
-		"PRA' 7/PALMARO CENTRO",			//	43
-		"PRA' 8/DE MARI",					//	44
-		"PRA' 9/VILLA PODESTA'",			//	45
-		"PRA' 10/VERRINA",					//	46
-		"VOLTRI/VOLTRI FS",					//	47
-		"VERITA'/VOLTRI FS",				//	48
-		"CAMOZZINI 1/GAGGERO",				//	49
-		"CAMOZZINI 2/PRATI",				//	50
-		"CAMOZZINI 3/CADUTI",				//	51
-		"CAMOZZINI/CAPOLINEA",				//	52
-	};
+	extern char	Linea1[][64];
 
 
 	struct	_twt_st {
@@ -175,7 +150,10 @@
 	
 	extern _gim_list	Passeggeri;
 	
-	_twt_man *	new_twt_man( gim_obj * gim );
+	_twt_man *		new_twt_man( gim_obj * gim );
+	const char *	get_state_name( _gim_flag st );
+	void			twt_sleep( float sec );
+	void 			viaggio_andata( _gim_Uint8 vg , gim_obj * gim , _gim_list * ps , _twt_st * twt );
 	
 #endif
 
