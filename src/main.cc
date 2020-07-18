@@ -18,11 +18,16 @@
  */
 
 #include <stdio.h>
-#include <unistd.h>             
-#include <gim/gim.h>
-
+#include <unistd.h>
 #include <twt_gkmake.h>
 #include <twt_define.h>
+
+gim_obj 		* gim = NULL;
+_gim_list		* people = NULL;
+_twt_st			* twt = NULL;
+_twt_man		* Tman = NULL;
+_gim_checksum	* cs = NULL;
+_gim_rand		* mt = NULL;
 
 int main( int argc , char **argv ) {
 
@@ -34,7 +39,7 @@ int main( int argc , char **argv ) {
     }
     
     gim_set_application_name( "TWT-Sim" );
-    gim_obj * gim = new gim_obj;
+    gim = new gim_obj;
     
     printf( "TWT-Sim : Tag Walking Technology Simulator\n" );
     printf( "Test suite for checking the TWT consistency algorithm\n" );
@@ -44,46 +49,42 @@ int main( int argc , char **argv ) {
 
 	printf( "  TWT status: creating...");
 	twt_sleep( 1.0 );
-	_twt_st	* twt = (_twt_st *)gim->memory->Alloc( sizeof( _twt_st ) ); 
+	twt = (_twt_st *)gim->memory->Alloc( sizeof( _twt_st ) ); 
 	twt->status = __INIT_ST;
-	twt->perc_non_paganti = 15;				//	%
-	twt->capienza = 120;					//	persone max
-	twt->intensita = 0;						//	flusso persone
-	twt->fermata_corrente = __UP_CAPO;		//	Capolinea 
-	twt->capolinea_sec = 30;
-	twt->chporte_sec = 2;
-	twt->viaggio_sec = 15;
-	twt->approccio_sec = 5;	
-	twt->errore = __GIM_NO;					//	Errore da iniettare
+	twt->ar = __UNKN;									//	andata o ritorno
+	twt->perc_evasione = __PERC_EVASIONE;				//	% evasione
+	twt->capienza = __CAPIENZA_MEZZO;					//	# passeggeri max
+	twt->intensita = __CURRENT_CROWD * __CROWD_CONST;	//	flusso persone
+	twt->fermata_corrente = __UP_CAPO;					//	Tempi di percorrenza
+	twt->arrivo_capolinea_sec = __CAPA_TM;				//	 .
+	twt->capolinea_sec = __CAPO_TM;						//	 .
+	twt->partenza_capolinea_sec = __CAPP_TM;			//	 .
+	twt->viaggio_sec = __VIAG_TM;						//	 .
+	twt->approccio_sec = __APPR_TM;						//	 .
+	twt->fermata_sec = __FERM_TM;						//	 .
+	twt->chporte_sec = __CHIU_TM;						//	-
+	twt->errore = __GIM_NO;								//	Errore da iniettare
 	printf( "done!\n");
 
 	twt_sleep( 0.2 );
 	printf( "  Current status: %s\n" , get_state_name( twt->status ) );
 	
 	printf( "  Passengers: creating...");
-	_gim_list		* people = new _gim_list;
-	_twt_man		* Tman = NULL;
-	_gim_checksum	* cs = new _gim_checksum;
+	people = new _gim_list;
+	Tman = NULL;
+	cs = new _gim_checksum;
+	mt = new _gim_rand;
 	
-/*	for( int c = 0 ; c < PEOPLE_NUMBER ; c++ ) {
-		Tman = new_twt_man( gim );
-		people->add_item( (void *)Tman );
-		usleep( 20 );
-	}
-*/	twt_sleep( 1.0 );
-	printf( "done!\n");
-	
-	puts( "\n-------------------------------------------------" );
 	twt_sleep( 1.0 );
-
+	printf( "done!\n");
+	twt_sleep( 1.0 );
 	twt->status = __STAR_ST;
-	printf( "  Current status: %s\n" , get_state_name( twt->status ) );
-	twt_sleep( 0.5 );
-	puts( "\n-------------------------------------------------" );
-		
 	__MAIN_LOOP( 10 ) {
-		viaggio_andata( vg , gim , people , twt );
 	
+		twt->ar = __ANDATA;
+		viaggio( vg );
+		twt->ar = __RITORNO;
+		viaggio( vg );
 	}
 	
 	puts("");

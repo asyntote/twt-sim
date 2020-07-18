@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <anjuta>
-    <plugin name="Terminal" mandatory="no">
+    <plugin name="Code Snippets" mandatory="no">
         <require group="Anjuta Plugin"
                  attribute="Location"
-                 value="anjuta-terminal:TerminalPlugin"/>
-    </plugin>
-    <plugin name="Git" mandatory="no">
-        <require group="Anjuta Plugin"
-                 attribute="Location"
-                 value="anjuta-git:Git"/>
+                 value="anjuta-snippets-manager:SnippetsManagerPlugin"/>
     </plugin>
     <plugin name="Quick Open" mandatory="no">
         <require group="Anjuta Plugin"
                  attribute="Location"
                  value="anjuta-quick-open:QuickOpenPlugin"/>
     </plugin>
-    <plugin name="Code Snippets" mandatory="no">
+    <plugin name="Git" mandatory="no">
         <require group="Anjuta Plugin"
                  attribute="Location"
-                 value="anjuta-snippets-manager:SnippetsManagerPlugin"/>
+                 value="anjuta-git:Git"/>
+    </plugin>
+    <plugin name="Terminal" mandatory="no">
+        <require group="Anjuta Plugin"
+                 attribute="Location"
+                 value="anjuta-terminal:TerminalPlugin"/>
     </plugin>
 </anjuta>

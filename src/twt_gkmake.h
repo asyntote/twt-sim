@@ -1,7 +1,7 @@
 /***************************************************************************
  *            twt_gkmake.h
  *
- *  Thursday 16-07-2020 01:45:08
+ *  Sunday 19-07-2020 00:19:30
  *  Copyright  2006  NSCore-DaniloZannoni
  *  gkmake version : 0.8-5
  *  asyntote@gkript.org
@@ -38,9 +38,9 @@
 #define	TWT_GKMAKE_VERSIONING
 
    #define TWT_AUTHOR                       NSCore-DaniloZannoni
-   #define TWT_GKMAKE_TOTAL_BUILD           156
-   #define TWT_GKMAKE_BUILD                 134
-   #define TWT_GKMAKE_LAST_BUILD            "Thursday 16-07-2020 01:45:08"
+   #define TWT_GKMAKE_TOTAL_BUILD           194
+   #define TWT_GKMAKE_BUILD                 157
+   #define TWT_GKMAKE_LAST_BUILD            "Sunday 19-07-2020 00:19:30"
    #define TWT_GKMAKE_RELEASE               "0.8-5"
 
 #endif

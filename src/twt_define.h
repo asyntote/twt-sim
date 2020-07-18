@@ -28,12 +28,22 @@
 
 #ifndef	__TWT_DEFINE__
 	#define	__TWT_DEFINE__
+
+
+	#define __PERC_EVASIONE		15.0	//	% di evasione
+	#define	__CAPIENZA_MEZZO	120		//	Totale dei posti
+
+
+
 	
 	#include <unistd.h>
-	#include <gim/gim_checksum.h>
-		
+	#include <gim/gim.h>
+	
 	#define __ACTIVE		1
 	#define	__NOT_ACTIVE	0
+	
+	#define	__RFID_TH_LO	10
+	#define	__RFID_TH_HI	33
 	
 	#define	__MAIN_LOOP(a)	for( _gim_Uint8 vg = 0 ; vg < a ; vg++ )	
 		
@@ -61,20 +71,15 @@
 	#define	__CAPA_TM	1.0		//	Arrivo in Capolinea
 	#define	__CAPO_TM	5.0		//	Sosta in Capolinea
 	#define	__CAPP_TM	1.0		//	Partenza da Capolinea
-	#define	__VIAG_TM	1.0		//	Viaggio
+	#define	__VIAG_TM	3.0		//	Viaggio
 	#define	__APPR_TM	1.0		//	Approccio in fermata
-	#define	__FERM_TM	1.0		//	Fermata
+	#define	__FERM_TM	2.0		//	Fermata
 	#define	__CHIU_TM	1.0		//	Ciusura porte e partenza da fermata
 	
-/*	#define	__STAR_TM	1.0
-	#define	__CAPA_TM	1.0		//	Arrivo in Capolinea
-	#define	__CAPO_TM	5.0		//	Sosta in Capolinea
-	#define	__CAPP_TM	1.0		//	Partenza da Capolinea
-	#define	__VIAG_TM	10.0	//	Viaggio
-	#define	__APPR_TM	2.0		//	Approccio in fermata
-	#define	__FERM_TM	5.0		//	Fermata
-	#define	__CHIU_TM	2.0		//	Ciusura porte e partenza da fermata
-*/	
+	
+	#define PERC_EVASIONE		15.0	//	% di evasione
+
+	#define	__CAPIENZA_MEZZO	120		//	Totale dei posti
 
 //	COLOR_NC='\e[0m'
 //	COLOR_RED='\e[0;31m'
@@ -108,26 +113,31 @@
 	
 	
 	#define	__UP_CAPO		0
-	#define	__DW_CAPO		52
+	#define	__DW_CAPO		5
 	#define __BSTOPS		( __DW_CAPO + 1 )		
 	
 	
 	extern char	Linea1[][64];
 
+	#define	__ANDATA		1
+	#define	__RITORNO		2
 
 	struct	_twt_st {
 		_gim_flag	status;
-		_gim_Uint8	perc_non_paganti;
+		float		perc_evasione;
 		_gim_Uint8	capienza;
 		_gim_Uint8	intensita;
+		_gim_flag	ar;
 		_gim_Uint8	fermata_corrente;
-		_gim_Uint8	viaggio_sec;
-		_gim_Uint8	approccio_sec;
-		_gim_Uint8	chporte_sec;
-		_gim_Uint8	capolinea_sec;
+		float		arrivo_capolinea_sec;
+		float		capolinea_sec;
+		float		partenza_capolinea_sec;
+		float		viaggio_sec;
+		float		approccio_sec;
+		float		fermata_sec;
+		float		chporte_sec;
 		_gim_flag	errore;
 	};	
-	
 	
 	#define	__MAX_PASS_UP		10
 	#define	__MAX_PASS_DW		10
@@ -136,6 +146,7 @@
 		_gim_flag	type;
 		_gim_Uint8	linea;
 		_gim_flag	active;
+		_gim_Uint8	id_viaggio; 
 		_gim_Uint8	id_salita;
 		_gim_flag	on_board;
 		_gim_Uint8	id_discesa;
@@ -148,12 +159,33 @@
 	
 	#define	PEOPLE_NUMBER	5000
 	
-	extern _gim_list	Passeggeri;
+	#define	__MAX_FERMATE	25						//	per passeggero
 	
-	_twt_man *		new_twt_man( gim_obj * gim );
+	#define	__CROWD_HI		3
+	#define	__CROWD_MD		2
+	#define	__CROWD_LO		1
+	#define	__CROWD_CONST	5
+	
+	#define __CURRENT_CROWD	__CROWD_MD
+
+	extern	gim_obj 		* gim;
+	extern	_gim_list		* people;
+	extern	_twt_st			* twt;
+	extern	_twt_man		* Tman;
+	extern	_gim_checksum	* cs;
+	extern	_gim_rand		* mt;
+	
+	extern _gim_list		Passeggeri;
+	
+	_twt_man *		new_twt_man( void );
 	const char *	get_state_name( _gim_flag st );
 	void			twt_sleep( float sec );
-	void 			viaggio_andata( _gim_Uint8 vg , gim_obj * gim , _gim_list * ps , _twt_st * twt );
+	void 			viaggio( _gim_Uint8 vg );
+	void			entrata_passeggero( void );
+	void			uscita_passeggero( void );
+	void 			ps_salita( _gim_int8 fermata , _gim_Uint8 vg );
+	void 			ps_discesa( _gim_int8 fermata , _gim_Uint8 vg );
+	
 	
 #endif
 
