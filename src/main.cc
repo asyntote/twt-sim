@@ -55,6 +55,7 @@ int main( int argc , char **argv ) {
 	twt->perc_evasione = __PERC_EVASIONE;				//	% evasione
 	twt->capienza = __CAPIENZA_MEZZO;					//	# passeggeri max
 	twt->intensita = __CURRENT_CROWD * __CROWD_CONST;	//	flusso persone
+	twt->num_passeggeri = 0;
 	twt->fermata_corrente = __UP_CAPO;					//	Tempi di percorrenza
 	twt->arrivo_capolinea_sec = __CAPA_TM;				//	 .
 	twt->capolinea_sec = __CAPO_TM;						//	 .
@@ -63,7 +64,7 @@ int main( int argc , char **argv ) {
 	twt->approccio_sec = __APPR_TM;						//	 .
 	twt->fermata_sec = __FERM_TM;						//	 .
 	twt->chporte_sec = __CHIU_TM;						//	-
-	twt->errore = __GIM_NO;								//	Errore da iniettare
+	twt->errore = __GIM_OK;								//	Errore da iniettare
 	printf( "done!\n");
 
 	twt_sleep( 0.2 );
@@ -79,12 +80,18 @@ int main( int argc , char **argv ) {
 	printf( "done!\n");
 	twt_sleep( 1.0 );
 	twt->status = __STAR_ST;
-	__MAIN_LOOP( 10 ) {
+	float vgf = 0.0;
 	
+	
+	__MAIN_LOOP( 10 ) {
+		
 		twt->ar = __ANDATA;
-		viaggio( vg );
+		vgf = (float)vg + 0.1;
+		viaggio( vgf );
 		twt->ar = __RITORNO;
-		viaggio( vg );
+		vgf += 0.1;
+		viaggio( vgf );
+		
 	}
 	
 	puts("");

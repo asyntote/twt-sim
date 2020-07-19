@@ -1,9 +1,9 @@
 [Anjuta]
 Maximized=1
-Geometry=1920x990+0+33
+Geometry=1920x994+0+29
 
 [File Loader]
-Files=../../src/main.cc#59%%%../../src/twt_gkmake.h#14%%%../../src/twt_define.h#48
+Files=../../src/main.cc#67%%%../../src/twt_define.h#50%%%../../src/twt_functions.cc#155
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

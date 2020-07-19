@@ -141,23 +141,23 @@ void	twt_sleep( float sec ) {
 }
 
 
-void 	viaggio( _gim_Uint8 vg ) {
+void 	viaggio( float vg ) {
 	_gim_Uint8 from = 0 , to = 0;
 	if ( twt->ar == __ANDATA ) {
 		from = __UP_CAPO;
-		to = __DW_CAPO;  
+		to = __DW_CAPO;
 	}
 	else if ( twt->ar == __RITORNO ) {
 		from = __DW_CAPO-1;
 		to = __UP_CAPO;  
 	}
 
-	for( _gim_int8 f = from ; twt->ar==__ANDATA?f<=to:f>=to ; ) {
+	for( _gim_int8 f = from ; ( ( twt->ar==__ANDATA?f<=to:f>=to ) && ( twt->errore == __GIM_OK ) ) ; ) {
 		switch ( twt->status ) {
 			case __STAR_ST : {
 				puts(   "\n\e[1;33m-------------------------------------------------\e[0m" );
 				twt_sleep( 0.5 );
-				printf( "  Travel \e[1;33m#%d\e[0m\n" , vg );
+				printf( "  Travel \e[1;33m#%1.1f\e[0m\n" , vg );
 				printf( "  Current status: \e[1;33m%s\e[0m\n" , get_state_name( twt->status ) );
 				puts(   "\e[1;33m-------------------------------------------------\e[0m\n" );
 				twt_sleep( __STAR_TM );
@@ -168,7 +168,7 @@ void 	viaggio( _gim_Uint8 vg ) {
 				puts( "\n\e[1;31m-------------------------------------------------" );
 				puts( "-------------------------------------------------" );
 				puts( "-------------------------------------------------\e[0m" );
-				printf( "  Travel \e[1;33m#%d\e[0m - Bus terminus: \e[1;31m%s\e[0m\n" , vg , Linea1[ f ] );
+				printf( "  Travel \e[1;33m#%1.1f\e[0m - Bus terminus: \e[1;31m%s\e[0m\n" , vg , Linea1[ f ] );
 				printf( "  Current status: " );
 				printf( "\e[0;1m%s\e[0m\n" , get_state_name( twt->status ) );
 				twt_sleep( twt->arrivo_capolinea_sec );
@@ -178,16 +178,22 @@ void 	viaggio( _gim_Uint8 vg ) {
 			case __CAPO_ST : {
 				printf( "  Current status: " );
 				printf( "\e[0;1m%s\e[0m\n" , get_state_name( twt->status ) );
+				
+				ps_discesa( f , vg );			
+				ps_salita( f , vg );
+				
 				twt_sleep( twt->capolinea_sec );
 				twt->status = __CAPP_ST;
+				twt->ar==__ANDATA?f++:f--;
 				break;
 			}
 			case __CAPP_ST : {
+				printf( "  Passengers on board: \e[0;1m%d\e[0m\n" , twt->num_passeggeri );
 				printf( "  Current status: " );
 				printf( "\e[0;1m%s\e[0m\n" , get_state_name( twt->status ) );
 				twt_sleep( twt->partenza_capolinea_sec );
 				twt->status = __VIAG_ST;
-				twt->ar==__ANDATA?f++:f--;
+				printf( "  Travel \e[1;33m#%1.1f\e[0m starting\n" , vg );
 				puts( "\e[1;31m-------------------------------------------------" );
 				puts( "-------------------------------------------------" );
 				puts( "-------------------------------------------------\e[0m\n" );
@@ -212,10 +218,9 @@ void 	viaggio( _gim_Uint8 vg ) {
 			case __FERM_ST : {
 				printf( "  Current status: " );
 				printf( "\e[0;1m%s\e[0m\n" , get_state_name( twt->status ) );
-				
-				
-				
-				
+							
+				ps_discesa( f , vg );
+				ps_salita( f , vg );
 				
 				twt_sleep( twt->fermata_sec );
 				twt->status = __CHIU_ST;
@@ -223,6 +228,7 @@ void 	viaggio( _gim_Uint8 vg ) {
 				break;
 			}
 			case __CHIU_ST : {
+				printf( "  Passengers on board: \e[0;1m%d\e[0m\n" , twt->num_passeggeri );
 				printf( "  Current status: " );
 				printf( "%s\n" , get_state_name( twt->status ) );
 				twt_sleep( twt->chporte_sec );
@@ -238,27 +244,129 @@ void 	viaggio( _gim_Uint8 vg ) {
 
 
 
-void	ps_salita( _gim_int8 fermata ) {
+void	ps_salita( _gim_int8 fermata , float vg ) {
 	_gim_Uint8	cr = twt->intensita;
 	_gim_Uint8	salite = 0;
 	_twt_man	* man = NULL;	
 	 
-	if ( ( fermata == __DW_CAPO ) || ( fermata == __UP_CAPO ) ) {
-		cr = __CROWD_LO;
-	}
-	salite = mt->randInt( cr );
-	for( _gim_Uint32 cnt = 0 ; cnt < salite ; cnt++ ) {
-		man = (_twt_man *)gim->memory->Alloc( sizeof( _twt_man ) );
-//		strcpy( man->code_id , 	
 	
+	if ( twt->num_passeggeri < twt->capienza ) {   	
+		if ( ( fermata == __DW_CAPO ) || ( fermata == __UP_CAPO ) ) {
+			cr = __CROWD_LO * __CROWD_CONST;
+		}
+		salite = mt->randInt( cr );
+		if ( ( salite + twt->num_passeggeri ) > twt->capienza )
+			salite = twt->capienza - twt->num_passeggeri;
+		printf( "    Num salite: %d\n" , salite ); 
+		for( _gim_Uint32 cnt = 0 ; cnt < salite ; cnt++ ) {
+			man = (_twt_man *)gim->memory->Alloc( sizeof( _twt_man ) );
+			
+			man->type = __UNKN;
+			man->linea = __LINEA;
+			man->active = __ACTIVE;
+			man->id_viaggio = vg;
+			man->id_salita = fermata;
+			man->on_board = __GIM_YES;
+			man->id_discesa = __UNKN;
+			man->perc_decisione = 10;
+			man->status = __UNKN;
+			man->optic_count = __GIM_YES;
+			strcpy( man->code_id , rf_id_passeggero() ); 	
+			
+			man->twt_str_code = __UNKN;
+			man->twt_mid_code = __UNKN;
+			man->twt_end_code = __UNKN;
+			
+			people->add_item( (void *)man );
+			
+			twt->num_passeggeri++;
+			
+			printf("        Salito passeggero: %s\n" , man->code_id );
+			
+		}
 	}
+}
 
+
+_gim_flag	man_decisione( _gim_int32 id ) {
+	_twt_man	* man = NULL;
+	_gim_flag 	res = __UNKN;
+	man = (_twt_man *)people->get_item( id );
+	
+	res = mt->stat_distr_over_100_percentage( man->perc_decisione );
+	if ( res == __GIM_NO ) { 
+		man->perc_decisione += 2;
+		return 0;
+	}
+	return id;
+}
+
+
+void	ps_discesa( _gim_int8 fermata , float vg ) {
+	_gim_Uint8	cr = twt->intensita;
+	_gim_Uint8	discese = 0;
+	_twt_man	* man = NULL;
+	_gim_Uint32 last_ps = people->items();
+	_gim_int32	old    = __UNKN;
+	_gim_int32	oldest = 0;
+	_gim_int32	oldest_id = 0;
+	_gim_int32	dec_id = __UNKN;
+	 
+	discese = mt->randInt( cr );
+	if ( discese > twt->num_passeggeri )
+		discese = twt->num_passeggeri;
+	if ( ( fermata == __DW_CAPO ) || ( fermata == __UP_CAPO ) ) {
+		discese = twt->num_passeggeri;
+	}
+	printf( "    Num discese: %d\n" , discese );
+	for( _gim_int32 cnt = 0 ; cnt < discese ; cnt++ ) {
+		oldest = 0;
+		for( _gim_int32 lpsid = 1 ; lpsid <= last_ps ; lpsid++ ) {
+			man = (_twt_man *)people->get_item( lpsid );
+			if ( ( man->id_viaggio == vg ) && ( man->on_board == __GIM_YES ) ) {
+				old = abs( fermata - man->id_salita );
+				dec_id = man_decisione( lpsid );
+				if ( ! dec_id ) {
+					if ( ( old >= oldest ) && ( man->on_board == __GIM_YES ) ) {
+						oldest = old;
+						oldest_id = lpsid;
+					}
+				}
+				else 
+					oldest_id = dec_id;
+			}
+		}
+		if ( old != __UNKN ) {
+			if ( oldest_id > 0 ) {
+				man = (_twt_man *)people->get_item( oldest_id );
+				man->id_discesa = fermata;
+				man->active = __NOT_ACTIVE;
+				printf("        Sceso passeggero:  %s - # fermate: %d - Perc_decisione: %d - Decisione: %s\n" , man->code_id , abs( man->id_discesa - man->id_salita ) , man->perc_decisione , dec_id==0?"NO":"YES" );
+				printf( "            On board: %d - CURRENT ID Viaggio %1.1f - ID Viaggio %1.1f - old: %d - oldest: %d - PS id: %d - Dec id: %d\n" , man->on_board , vg , man->id_viaggio , old , oldest , oldest_id , dec_id );
+				man->on_board = __GIM_NO;
+				twt->num_passeggeri--;
+			}				
+			else {
+				printf("\n\e[1;31m    !!!Corrected index value!!!\n    He is still on board!!!\e[0m\n" );
+				twt->errore = __GIM_ERROR;
+			}
+		}
+		else {
+			printf("        Errore in discesa passeggero\n" );
+		}
+		
+	}
 }
 
 
 
-void	ps_discesa( _gim_int8 fermata , gim_obj * gim , _gim_list * ps , _twt_st * twt ) {
-
-
-
+char *	rf_id_passeggero( void ) {
+	_gim_Uint32	rnd = 0;
+	mt->seed();
+	rnd = mt->randInt();
+	return cs->md5( (char *)&rnd , sizeof( _gim_Uint32 ) );
 }
+
+
+
+
