@@ -111,8 +111,11 @@ const char *		get_state_name( _gim_flag st ) {
 		case __CAPA_ST : {
 			return __CAPA;
 		}
-		case __CAPO_ST : {
-			return __CAPO;
+		case __CAPF_ST : {
+			return __CAPF;
+		}
+		case __CAPI_ST : {
+			return __CAPI;
 		}
 		case __CAPP_ST : {
 			return __CAPP;
@@ -166,25 +169,35 @@ void 	viaggio( float vg ) {
 			}
 			case __CAPA_ST : {								//	CAPOLINEA ----------------------------------------------------------------------------
 				puts( "\n\e[1;31m-------------------------------------------------" );
-				puts( "-------------------------------------------------" );
+				TWT_DEBUG puts( "-------------------------------------------------" );
 				puts( "-------------------------------------------------\e[0m" );
-				printf( "  Travel \e[1;33m#%1.1f\e[0m - Bus terminus: \e[1;31m%s\e[0m\n" , vg , Linea1[ f ] );
+				printf( "  Travel \e[1;33m#%1.1f\e[0m\n" , vg );
+				printf( "  Bus stop \e[0;32m#%d\e[0m - Bus terminus: \e[1;31m%s\e[0m\n" , f , Linea1[ f ] );
+
 				printf( "  Current status: " );
 				printf( "\e[0;1m%s\e[0m\n" , get_state_name( twt->status ) );
 				twt_sleep( twt->arrivo_capolinea_sec );
-				twt->status = __CAPO_ST;
+				twt->status = __CAPF_ST;
 				break;
 			}
-			case __CAPO_ST : {
-				printf( "  Current status: " );
-				printf( "\e[0;1m%s\e[0m\n" , get_state_name( twt->status ) );
+			case __CAPF_ST : {
+				TWT_DEBUG printf( "  Current status: " );
+				TWT_DEBUG printf( "\e[0;1m%s\e[0m\n" , get_state_name( twt->status ) );
 				
 				ps_discesa( f , vg );			
-				ps_salita( f , vg );
+
+				twt_sleep( twt->capolinea_sec );
+				twt->status = __CAPI_ST;
+				twt->ar==__ANDATA?f++:f--;
+				break;
+			}
+			case __CAPI_ST : {
+				printf( "  New travel starting: \e[0;1m%1.1f\e[0m\n" , vg );
+
+				ps_salita( twt->ar==__ANDATA?f-1:f+1 , vg );
 				
 				twt_sleep( twt->capolinea_sec );
 				twt->status = __CAPP_ST;
-				twt->ar==__ANDATA?f++:f--;
 				break;
 			}
 			case __CAPP_ST : {
@@ -195,7 +208,7 @@ void 	viaggio( float vg ) {
 				twt->status = __VIAG_ST;
 				printf( "  Travel \e[1;33m#%1.1f\e[0m starting\n" , vg );
 				puts( "\e[1;31m-------------------------------------------------" );
-				puts( "-------------------------------------------------" );
+				TWT_DEBUG puts( "-------------------------------------------------" );
 				puts( "-------------------------------------------------\e[0m\n" );
 				break;
 			}
@@ -208,7 +221,7 @@ void 	viaggio( float vg ) {
 				break;
 			}
 			case __APPR_ST : {								//	FERMATA ----------------------------------------------------------------------------
-				printf( "  Bus stop \e[0;32m#%d\e[0m - Bust stop: \e[0;32m%s\e[0m\n" , f , Linea1[ f ] );
+				printf( "  Bus stop \e[0;32m#%d\e[0m - Bus stop: \e[0;32m%s\e[0m\n" , f , Linea1[ f ] );
 				printf( "  Current status: " );
 				printf( "\e[0;1m%s\e[0m\n" , get_state_name( twt->status ) );
 				twt_sleep( twt->approccio_sec );
@@ -291,8 +304,9 @@ void	ps_salita( _gim_int8 fermata , float vg ) {
 _gim_flag	man_decisione( _gim_int32 id ) {
 	_twt_man	* man = NULL;
 	_gim_flag 	res = __UNKN;
+
+	TWT_DEBUG printf( "  -- ricevuto id (%d)\n" , id );
 	man = (_twt_man *)people->get_item( id );
-	
 	res = mt->stat_distr_over_100_percentage( man->perc_decisione );
 	if ( res == __GIM_NO ) { 
 		man->perc_decisione += 2;
@@ -316,45 +330,73 @@ void	ps_discesa( _gim_int8 fermata , float vg ) {
 	if ( discese > twt->num_passeggeri )
 		discese = twt->num_passeggeri;
 	if ( ( fermata == __DW_CAPO ) || ( fermata == __UP_CAPO ) ) {
-		discese = twt->num_passeggeri;
+		for( _gim_int32 cnt = 1 ; cnt <= last_ps ; cnt++ ) {
+			man = (_twt_man *)people->get_item( cnt );
+			if ( man->active == __ACTIVE ) {			
+				TWT_DEBUG printf( "Cur viaggio: %1.1f - Viaggio effettuato: %1.1f - ciclo %d - %s - %s\n" , vg , man->id_viaggio , cnt , man->code_id , man->on_board==__GIM_YES?"ON BOARD":"NOT ON BOARD" );
+				if ( ( man->id_viaggio == vg ) && ( man->on_board == __GIM_YES ) ) {
+					man->id_discesa = fermata;
+					man->active = __NOT_ACTIVE;
+					TWT_DEBUG printf( "        Capolinea!!! Sceso passeggero:  \e[1;34m%s\e[0m - # fermate: %d\n" , man->code_id , abs( man->id_discesa - man->id_salita ) );
+					man->on_board = __GIM_NO;
+					twt->num_passeggeri--;
+				}
+			}
+		}
 	}
-	printf( "    Num discese: %d\n" , discese );
-	for( _gim_int32 cnt = 0 ; cnt < discese ; cnt++ ) {
-		oldest = 0;
-		for( _gim_int32 lpsid = 1 ; lpsid <= last_ps ; lpsid++ ) {
-			man = (_twt_man *)people->get_item( lpsid );
-			if ( ( man->id_viaggio == vg ) && ( man->on_board == __GIM_YES ) ) {
-				old = abs( fermata - man->id_salita );
-				dec_id = man_decisione( lpsid );
-				if ( ! dec_id ) {
-					if ( ( old >= oldest ) && ( man->on_board == __GIM_YES ) ) {
-						oldest = old;
+	else {
+		TWT_DEBUG printf( "    Items: %d - Num discese: %d\n" , last_ps , discese );
+		for( _gim_int32 cnt = 0 ; cnt < discese ; cnt++ ) {
+			oldest = 0;
+			for( _gim_int32 lpsid = 1 ; ( ( lpsid <= last_ps ) && ( dec_id <= 0 ) ) ; lpsid++ ) {
+				man = (_twt_man *)people->get_item( lpsid );
+				if ( ( man->id_viaggio == vg ) && ( man->on_board == __GIM_YES ) ) {
+					old = abs( fermata - man->id_salita );
+					dec_id = man_decisione( lpsid );
+					TWT_DEBUG printf("        ID fermata: %d - ID salita: %d - # fermate: %d\n" , fermata , man->id_salita , abs( fermata - man->id_salita ) );
+					TWT_DEBUG printf("        ID: %d - Analisi passeggero:  %s - # fermate: %d - Perc_decisione: %d - Decisione: %s\n" , lpsid , man->code_id , abs( fermata - man->id_salita ) , man->perc_decisione , dec_id<=0?"NO":"YES" );
+					if ( dec_id > 0 ) {
 						oldest_id = lpsid;
+						TWT_DEBUG printf("        The passenger wants to get off - ID: %d - Analisi passeggero:  %s - # fermate: %d\n" , lpsid , man->code_id , abs( fermata - man->id_salita ) );
+					}
+					else { 
+						if ( ( old > oldest ) && ( man->on_board == __GIM_YES ) ) {
+							oldest = old;
+							oldest_id = lpsid;
+							TWT_DEBUG printf("        Seraching for oldest - ID: %d - Analisi passeggero:  %s - # fermate: %d\n" , lpsid , man->code_id , abs( fermata- man->id_salita ) );
+						}
 					}
 				}
-				else 
-					oldest_id = dec_id;
+				else {
+					TWT_DEBUG printf(" -- Not same Travel or not on board! Current travel %1.1f - Passenger travel: %1.1f - On board %s - ID discesa: %d - %s\n" , vg , man->id_viaggio , man->on_board==__GIM_NO?"NO":"YES" , man->id_discesa , man->code_id );  
+				}
 			}
-		}
-		if ( old != __UNKN ) {
-			if ( oldest_id > 0 ) {
-				man = (_twt_man *)people->get_item( oldest_id );
-				man->id_discesa = fermata;
-				man->active = __NOT_ACTIVE;
-				printf("        Sceso passeggero:  %s - # fermate: %d - Perc_decisione: %d - Decisione: %s\n" , man->code_id , abs( man->id_discesa - man->id_salita ) , man->perc_decisione , dec_id==0?"NO":"YES" );
-				printf( "            On board: %d - CURRENT ID Viaggio %1.1f - ID Viaggio %1.1f - old: %d - oldest: %d - PS id: %d - Dec id: %d\n" , man->on_board , vg , man->id_viaggio , old , oldest , oldest_id , dec_id );
-				man->on_board = __GIM_NO;
-				twt->num_passeggeri--;
-			}				
+			TWT_DEBUG printf(" -- Out from the main cicle! ID: %d\n" , oldest_id );		
+			if ( ( old != __UNKN ) || ( dec_id > 0 ) ) {
+				
+				if ( oldest_id > 0 ) {
+					man = (_twt_man *)people->get_item( oldest_id );
+					man->id_discesa = fermata;
+					man->active = __NOT_ACTIVE;
+					printf("        Sceso passeggero:  \e[1;34m%s\e[0m - # fermate: %d - Perc_decisione: %d - Decisione: %s\n" , man->code_id , abs( man->id_discesa - man->id_salita ) , man->perc_decisione , dec_id<=0?"NO":"YES" );
+					TWT_DEBUG printf( "            On board: %d - CURRENT ID Viaggio %1.1f - ID Viaggio %1.1f - old: %d - oldest: %d - PS id: %d - Dec id: %d\n" , man->on_board , vg , man->id_viaggio , old , oldest , oldest_id , dec_id );
+					man->on_board = __GIM_NO;
+					twt->num_passeggeri--;
+					dec_id = __UNKN;
+				}				
+				else {
+					TWT_DEBUG printf( "\n    CURRENT ID Viaggio %1.1f - old: %d - oldest: %d - PS id: \e[1;31m%d\e[0m - Decision: %s (%d)\n" , vg , old , oldest , oldest_id , dec_id<=0?"NO":"YES" , dec_id );
+					TWT_DEBUG printf("\e[1;31m    !!!Corrected index value!!!\n    He is still on board!!!\e[0m\n" );
+					twt->errore = __GIM_ERROR;
+				}
+			}
 			else {
-				printf("\n\e[1;31m    !!!Corrected index value!!!\n    He is still on board!!!\e[0m\n" );
+				TWT_DEBUG printf( "\n    CURRENT ID Viaggio %1.1f - old: %d - oldest: %d - PS id: \e[1;31m%d\e[0m - Decision: %s (%d)\n" , vg , old , oldest , oldest_id , dec_id<=0?"NO":"YES" , dec_id  );
+				TWT_DEBUG printf( "\e[1;31m    Errore in discesa passeggero\e[0m\n" );
 				twt->errore = __GIM_ERROR;
 			}
+			
 		}
-		else {
-			printf("        Errore in discesa passeggero\n" );
-		}
-		
 	}
 }
 

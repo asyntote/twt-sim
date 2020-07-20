@@ -12,8 +12,8 @@
         clean                            = YES
         multi_threads_enable             = YES
         number_of_threads                = 0
-        total_build_number               = 248
-        succesful_build_number           = 204
+        total_build_number               = 302
+        succesful_build_number           = 254
     } 
     # ------------------------------------
 

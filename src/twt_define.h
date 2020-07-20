@@ -33,7 +33,9 @@
 	#define __PERC_EVASIONE		15.0	//	% di evasione
 	#define	__CAPIENZA_MEZZO	120		//	Totale dei posti
 
+	#define	TXT_DEBUG_STATE		__GIM_NO
 
+	#define TWT_DEBUG			if( TXT_DEBUG_STATE == __GIM_YES ) 
 
 	
 	#include <unistd.h>
@@ -52,7 +54,8 @@
 	#define	__INIT		"TWT Initialization!"	
 	#define	__STAR		"The bus starts the service"
 	#define	__CAPA		"Arrival at the bus terminus."
-	#define	__CAPO		"Stop at the bus terminus."
+	#define	__CAPF		"Stop at the bus terminus."
+	#define	__CAPI		"Stop at the bus terminus."
 	#define	__CAPP		"Departure from the bus terminus."
 	#define	__VIAG		"Bus traveling."
 	#define	__APPR		"Bus approaching the stop."
@@ -62,21 +65,22 @@
 	#define	__INIT_ST	-2		//	Inizialiazzazione
 	#define	__STAR_ST	-1		//	Entrata in servizio
 	#define	__CAPA_ST	0		//	Arrivo in Capolinea
-	#define	__CAPO_ST	2		//	Sosta in Capolinea
+	#define	__CAPF_ST	6		//	Sosta in Capolinea
+	#define	__CAPI_ST	7		//	Sosta in Capolinea
 	#define	__CAPP_ST	1		//	Partenza da Capolinea
-	#define	__VIAG_ST	3		//	Viaggio
-	#define	__APPR_ST	4		//	Approccio in fermata
-	#define	__FERM_ST	5		//	Fermata
-	#define	__CHIU_ST	6		//	Ciusura porte e partenza da fermata
+	#define	__VIAG_ST	2		//	Viaggio
+	#define	__APPR_ST	3		//	Approccio in fermata
+	#define	__FERM_ST	4		//	Fermata
+	#define	__CHIU_ST	5		//	Ciusura porte e partenza da fermata
 	
-	#define	__STAR_TM	0.5
-	#define	__CAPA_TM	0.2		//	Arrivo in Capolinea
-	#define	__CAPO_TM	1.0		//	Sosta in Capolinea
-	#define	__CAPP_TM	0.2		//	Partenza da Capolinea
-	#define	__VIAG_TM	0.5		//	Viaggio
-	#define	__APPR_TM	0.2		//	Approccio in fermata
-	#define	__FERM_TM	1.0		//	Fermata
-	#define	__CHIU_TM	0.2		//	Ciusura porte e partenza da fermata
+	#define	__STAR_TM	0.01
+	#define	__CAPA_TM	0.01		//	Arrivo in Capolinea
+	#define	__CAPF_TM	0.01		//	Sosta in Capolinea
+	#define	__CAPP_TM	0.01		//	Partenza da Capolinea
+	#define	__VIAG_TM	0.01		//	Viaggio
+	#define	__APPR_TM	0.01		//	Approccio in fermata
+	#define	__FERM_TM	0.01		//	Fermata
+	#define	__CHIU_TM	0.01		//	Ciusura porte e partenza da fermata
 	
 	
 	#define PERC_EVASIONE		15.0	//	% di evasione
@@ -173,7 +177,7 @@
 	#define	__CROWD_LO		1
 	#define	__CROWD_CONST	5
 	
-	#define __CURRENT_CROWD	__CROWD_HI
+	#define __CURRENT_CROWD	__CROWD_LO
 
 	extern	gim_obj 		* gim;
 	extern	_gim_list		* people;

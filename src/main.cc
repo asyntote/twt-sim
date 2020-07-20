@@ -58,7 +58,7 @@ int main( int argc , char **argv ) {
 	twt->num_passeggeri = 0;
 	twt->fermata_corrente = __UP_CAPO;					//	Tempi di percorrenza
 	twt->arrivo_capolinea_sec = __CAPA_TM;				//	 .
-	twt->capolinea_sec = __CAPO_TM;						//	 .
+	twt->capolinea_sec = __CAPF_TM;						//	 .
 	twt->partenza_capolinea_sec = __CAPP_TM;			//	 .
 	twt->viaggio_sec = __VIAG_TM;						//	 .
 	twt->approccio_sec = __APPR_TM;						//	 .
