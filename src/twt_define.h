@@ -30,62 +30,92 @@
 	#define	__TWT_DEFINE__
 
 
-	#define __PERC_EVASIONE		15.0	//	% di evasione
-	#define	__CAPIENZA_MEZZO	120		//	Totale dei posti
+	#define __PERC_EVASIONE				15.0		//	% di evasione
+	#define	__CAPIENZA_MEZZO			120			//	Totale dei posti
+	#define	__DECISION_PARAM_START		20
+	#define	__DECISION_PARAM_INCR		5
 
-	#define	TXT_DEBUG_STATE		__GIM_NO
+	#define	__PERC_OPTIC_FAIL			1.0
+	#define	__PERC_RADIO_FAIL			1.0
 
-	#define TWT_DEBUG			if( TXT_DEBUG_STATE == __GIM_YES ) 
+	#define	__MISSING_ID				"--------------------------------"
+	#define	__MISSING_ID_FIND			"----"
+	#define	__NULL_ID					"................................"
+	#define	__NULL_ID_FIND				"...."
+
+	#define	TXT_DEBUG_STATE				__GIM_NO
+	#define TWT_DEBUG					if( TXT_DEBUG_STATE == __GIM_YES ) 
+	
+	#define	__GET_ON_BOARD				1
+	#define	__GET_OFF					2
 
 	
 	#include <unistd.h>
 	#include <gim/gim.h>
 	
-	#define __ACTIVE		1
-	#define	__NOT_ACTIVE	0
 	
-	#define	__LINEA			1
+	#define	__LINEA				1
 	
-	#define	__RFID_TH_LO	10
-	#define	__RFID_TH_HI	33
+	#define	__RFID_TH_LO		10
+	#define	__RFID_TH_HI		33
 	
-	#define	__MAIN_LOOP(a)	for( _gim_Uint8 vg = 1 ; ( (vg <= a ) && ( twt->errore == __GIM_OK ) ) ; vg++ )	
+	#define	__TIME_NORMAL
+	
+	#define	__MAIN_LOOP( a )	for( _gim_Uint8 vg = 1 ; ( (vg <= a ) && ( twt->errore == __GIM_OK ) ) ; vg++ )	
 		
-	#define	__INIT		"TWT Initialization!"	
-	#define	__STAR		"The bus starts the service"
-	#define	__CAPA		"Arrival at the bus terminus."
-	#define	__CAPF		"Stop at the bus terminus."
-	#define	__CAPI		"Stop at the bus terminus."
-	#define	__CAPP		"Departure from the bus terminus."
-	#define	__VIAG		"Bus traveling."
-	#define	__APPR		"Bus approaching the stop."
-	#define	__FERM		"The bus stops. Doors opening."
-	#define	__CHIU		"Doors closing. The bus leaves the stop."
+	#define	__INIT				"TWT Initialization!"	
+	#define	__STAR				"The bus starts the service"
+	#define	__CAPA				"Arrival at the bus terminus."
+	#define	__CAPF				"Stop at the bus terminus."
+	#define	__CAPI				"Stop at the bus terminus."
+	#define	__CAPP				"Departure from the bus terminus."
+	#define	__VIAG				"Bus traveling."
+	#define	__APPR				"Bus approaching the stop."
+	#define	__FERM				"The bus stops. Doors opening."
+	#define	__CHIU				"Doors closing. The bus leaves the stop."
 
-	#define	__INIT_ST	-2		//	Inizialiazzazione
-	#define	__STAR_ST	-1		//	Entrata in servizio
-	#define	__CAPA_ST	0		//	Arrivo in Capolinea
-	#define	__CAPF_ST	6		//	Sosta in Capolinea
-	#define	__CAPI_ST	7		//	Sosta in Capolinea
-	#define	__CAPP_ST	1		//	Partenza da Capolinea
-	#define	__VIAG_ST	2		//	Viaggio
-	#define	__APPR_ST	3		//	Approccio in fermata
-	#define	__FERM_ST	4		//	Fermata
-	#define	__CHIU_ST	5		//	Ciusura porte e partenza da fermata
+	#define	__INIT_ST			-2		//	Inizialiazzazione
+	#define	__STAR_ST			-1		//	Entrata in servizio
+	#define	__CAPA_ST			0		//	Arrivo in Capolinea
+	#define	__CAPF_ST			6		//	Sosta in Capolinea
+	#define	__CAPI_ST			7		//	Sosta in Capolinea
+	#define	__CAPP_ST			1		//	Partenza da Capolinea
+	#define	__VIAG_ST			2		//	Viaggio
+	#define	__APPR_ST			3		//	Approccio in fermata
+	#define	__FERM_ST			4		//	Fermata
+	#define	__CHIU_ST			5		//	Ciusura porte e partenza da fermata
 	
-	#define	__STAR_TM	0.01
-	#define	__CAPA_TM	0.01		//	Arrivo in Capolinea
-	#define	__CAPF_TM	0.01		//	Sosta in Capolinea
-	#define	__CAPP_TM	0.01		//	Partenza da Capolinea
-	#define	__VIAG_TM	0.01		//	Viaggio
-	#define	__APPR_TM	0.01		//	Approccio in fermata
-	#define	__FERM_TM	0.01		//	Fermata
-	#define	__CHIU_TM	0.01		//	Ciusura porte e partenza da fermata
+	#ifdef __TIME_FAST	
+		#define	__STAR_TM			0.01
+		#define	__CAPA_TM			0.01	//	Arrivo in Capolinea
+		#define	__CAPF_TM			0.01	//	Sosta in Capolinea
+		#define	__CAPP_TM			0.01	//	Partenza da Capolinea
+		#define	__VIAG_TM			0.01	//	Viaggio
+		#define	__APPR_TM			0.01	//	Approccio in fermata
+		#define	__FERM_TM			0.01	//	Fermata
+		#define	__CHIU_TM			0.01	//	Ciusura porte e partenza da fermata
+	#endif	
+	#ifdef __TIME_READEBLE	
+		#define	__STAR_TM			0.51
+		#define	__CAPA_TM			0.51	//	Arrivo in Capolinea
+		#define	__CAPF_TM			0.51	//	Sosta in Capolinea
+		#define	__CAPP_TM			0.51	//	Partenza da Capolinea
+		#define	__VIAG_TM			0.51	//	Viaggio
+		#define	__APPR_TM			0.51	//	Approccio in fermata
+		#define	__FERM_TM			0.51	//	Fermata
+		#define	__CHIU_TM			0.51	//	Ciusura porte e partenza da fermata
+	#endif	
+	#ifdef __TIME_NORMAL
+		#define	__STAR_TM			1.0
+		#define	__CAPA_TM			1.5		//	Arrivo in Capolinea
+		#define	__CAPF_TM			2.5		//	Sosta in Capolinea
+		#define	__CAPP_TM			0.5		//	Partenza da Capolinea
+		#define	__VIAG_TM			1.5		//	Viaggio
+		#define	__APPR_TM			0.5		//	Approccio in fermata
+		#define	__FERM_TM			2.5		//	Fermata
+		#define	__CHIU_TM			0.5		//	Ciusura porte e partenza da fermata
+	#endif	
 	
-	
-	#define PERC_EVASIONE		15.0	//	% di evasione
-
-	#define	__CAPIENZA_MEZZO	120		//	Totale dei posti
 
 //	COLOR_NC='\e[0m'
 //	COLOR_RED='\e[0;31m'
@@ -95,11 +125,15 @@
 	enum _man_status {
 		__UNKN = -1,
 		__UNDIFINED,
-		__PAGANTE,
-		__NON_PAGANTE,
-		__FAMIGLIA,
-		__AUTISTA,
+		__ACTIVE,
+		__NOT_ACTIVE,
+		__PAYING_USER,
+		__NON_PAYING_USER,
+		__POSSIBLE_OPTIC_FAIL,
+		__FAMILY,
+		__DRIVER,
 	};
+
 
 	enum _acq_items_status_enum {
 		//	twt_str_code		PRIMO PASSAGGIO			CONDIZIONE OTTICO	CONDIZIONE RFID		twt_		FINALE		
@@ -119,6 +153,7 @@
 	
 	
 	#define	__UP_CAPO		0
+
 	#define	__DW_CAPO		52
 	#define __BSTOPS		( __DW_CAPO + 1 )		
 	
@@ -150,12 +185,13 @@
 	#define	__MAX_PASS_DW		10
 	
 	#define __TH_DISCESA		6
-
+	
 	struct _twt_man {
 		_gim_flag	type;
 		_gim_Uint8	linea;
 		_gim_flag	active;
 		float	id_viaggio;
+		_gim_flag	direction;
 		_gim_Uint8	id_salita;
 		_gim_flag	on_board;
 		_gim_Uint8	id_discesa;
@@ -168,7 +204,7 @@
 		_gim_flag	twt_end_code;
 	};
 	
-	#define	PEOPLE_NUMBER	5000
+	#define	__SIM_VIAGGI	5
 	
 	#define	__MAX_FERMATE	25						//	per passeggero
 	
@@ -177,7 +213,7 @@
 	#define	__CROWD_LO		1
 	#define	__CROWD_CONST	5
 	
-	#define __CURRENT_CROWD	__CROWD_LO
+	#define __CURRENT_CROWD	__CROWD_HI
 
 	extern	gim_obj 		* gim;
 	extern	_gim_list		* people;
@@ -197,6 +233,8 @@
 	void 			ps_discesa( _gim_int8 fermata , float vg );
 	char *			rf_id_passeggero( void );
 	_gim_flag		man_decisione( _gim_int32 id );
+	
+	void			analisi_P1_P2_E1( _twt_man	* man );
 	
 	
 #endif

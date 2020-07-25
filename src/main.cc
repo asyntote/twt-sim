@@ -29,6 +29,8 @@ _twt_man		* Tman = NULL;
 _gim_checksum	* cs = NULL;
 _gim_rand		* mt = NULL;
 
+_gim_Uint8		giri = __SIM_VIAGGI;
+
 int main( int argc , char **argv ) {
 
     if ( gim_check_version(2,8) != __GIM_OK ) {
@@ -76,14 +78,19 @@ int main( int argc , char **argv ) {
 	cs = new _gim_checksum;
 	mt = new _gim_rand;
 	
-	twt_sleep( 1.0 );
+	twt_sleep( 0.5 );
 	printf( "done!\n");
-	twt_sleep( 1.0 );
+	twt_sleep( 0.5 );
 	twt->status = __STAR_ST;
 	float vgf = 0.0;
 	
+	if ( argc > 1 )
+		giri = atoi( argv[1] );
+		
+	printf( "  Travels # set to %d\n" , giri );
+	twt_sleep( 2.0 );
 	
-	__MAIN_LOOP( 10 ) {
+	__MAIN_LOOP( giri ) {
 		
 		twt->ar = __ANDATA;
 		vgf = (float)vg + 0.1;
@@ -93,8 +100,9 @@ int main( int argc , char **argv ) {
 		viaggio( vgf );
 		
 	}
-	
-	puts("");
+
+	twt_sleep( 0.5 );
+
 	gim->memory->Free( (void *)twt );
 	delete cs;
 	delete people;   

@@ -2,21 +2,20 @@
 Maximized=1
 Geometry=1920x890+0+29
 
-[File Loader]
-Files=../../src/main.cc#67%%%../../src/twt_define.h#162%%%../../src/twt_functions.cc#375
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
-
 [Execution]
 Run in terminal=2
 Working directories=../../.
+
+[File Loader]
+Files=../../src/main.cc#57%%%../../src/twt_define.h#216%%%../../src/twt_functions.cc#545
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
 [Project Manager]
 Expand=twt-sim%%%twt-sim//src%%%twt-sim//src//twt_sim
 
 [Debugger]
-Breakpoint=1:../../src/twt_functions.cc:359:0:
 Stop at beginning=2
 
 [Build]
